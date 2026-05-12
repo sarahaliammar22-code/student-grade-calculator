@@ -1,59 +1,96 @@
 import tkinter as tk
 from tkinter import messagebox
-import webbrowser  # مكتبة أساسية لفتح الروابط في المتصفح
+import webbrowser
+
+def calculate_gpa(perc):
+    # دالة فرعية لحساب الـ GPA التراكمي من 4.0 بناءً على النسبة
+    if perc >= 90: return 4.0
+    elif perc >= 85: return 3.7
+    elif perc >= 80: return 3.3
+    elif perc >= 75: return 3.0
+    elif perc >= 70: return 2.7
+    elif perc >= 65: return 2.4
+    elif perc >= 60: return 2.0
+    elif perc >= 50: return 1.0
+    else: return 0.0
 
 def calculate():
     try:
-        # سحب درجات المواد الثلاثة
-        m1 = float(entry1.get())
-        m2 = float(entry2.get())
-        m3 = float(entry3.get())
+        # 1. سحب درجات الـ 5 مواد من الخانات
+        grades = [
+            float(entry1.get()),
+            float(entry2.get()),
+            float(entry3.get()),
+            float(entry4.get()),
+            float(entry5.get())
+        ]
         
-        # حساب المجموع الكلي والنسبة المئوية
-        total = m1 + m2 + m3
-        perc = (total / 300) * 100
+        # التأكد أن الدرجات منطقية (بين 0 و 100)
+        for g in grades:
+            if g < 0 or g > 100:
+                messagebox.showerror("خطأ في القيمة", "الدرجات يجب أن تكون بين 0 و 100!")
+                return
         
-        # تحديد التقدير بناءً على النسبة
+        # 2. العمليات الحسابية
+        total = sum(grades)
+        perc = (total / 500) * 100  # المجموع الكلي من 500
+        gpa = calculate_gpa(perc)
+        
+        # 3. تحديد التقدير العام
         if perc >= 90: grade = "امتياز 🌟"
         elif perc >= 80: grade = "جيد جداً ✅"
         elif perc >= 65: grade = "جيد 🆗"
         elif perc >= 50: grade = "مقبول ⚠️"
         else: grade = "راسب ❌"
         
-        # إظهار رسالة النتيجة للمستخدم
-        messagebox.showinfo("النتيجة النهائية", f"المجموع: {total} من 300\nالنسبة: {perc:.1f}%\nالتقدير: {grade}")
+        # 4. عرض النتيجة بشكل منسق ومفصل
+        result_text = (
+            f"📊 النتيجة الكلية:\n\n"
+            f"🔹 المجموع: {total} / 500\n"
+            f"🔹 النسبة المئوية: {perc:.2f}%\n"
+            f"🔹 المعدل التراكمي (GPA): {gpa:.2f} / 4.0\n"
+            f"🔹 التقدير العام: {grade}"
+        )
+        messagebox.showinfo("التقرير الدراسي المطور", result_text)
+        
     except ValueError:
-        # إظهار رسالة خطأ في حال إدخال نصوص بدلاً من أرقام
-        messagebox.showerror("خطأ في الإدخال", "برجاء كتابة أرقام صحيحة في خانات المواد!")
+        messagebox.showerror("خطأ في الإدخال", "برجاء التأكد من كتابة أرقام صحيحة في جميع الخانات!")
 
-# دالة فتح رابط المشروع الخاص بكِ على GitHub
 def open_github():
-    webbrowser.open("https://github.com/sarahaliammar22-code/student-grade-calculator")
+    webbrowser.open("github.com")
 
-# إعداد النافذة الرئيسية للبرنامج (GUI)
+# --- تصميم واجهة المستخدم الحديثة ---
 app = tk.Tk()
-app.title("حاسبة التقديرات")
-app.geometry("320x400")
-app.configure(bg="#f5f5f5") # لون خلفية رمادي فاتح مريح للعين
+app.title("نظام حساب المعدلات الذكي")
+app.geometry("360x520")
+app.configure(bg="#2c3e50") # خلفية داكنة واحترافية (Dark Slate)
 
-# واجهة إدخال البيانات (العناوين وخانات الكتابة)
-tk.Label(app, text="درجة المادة الأولى:", bg="#f5f5f5", font=("Arial", 10, "bold")).pack(pady=5)
-entry1 = tk.Entry(app, font=("Arial", 10), justify="center")
-entry1.pack()
+# عنوان رئيسي علوي للبرنامج
+title_label = tk.Label(app, text="🎓 حاسبة الدرجات والمعدل الدراسي", bg="#2c3e50", fg="#ecf0f1", font=("Arial", 12, "bold"))
+title_label.pack(pady=15)
 
-tk.Label(app, text="درجة المادة الثانية:", bg="#f5f5f5", font=("Arial", 10, "bold")).pack(pady=5)
-entry2 = tk.Entry(app, font=("Arial", 10), justify="center")
-entry2.pack()
+# دالة مساعدة لإنشاء العناوين وخانات الإدخال بتنسيق ثابت ومتناسق
+def create_input_field(label_text):
+    lbl = tk.Label(app, text=label_text, bg="#2c3e50", fg="#bdc3c7", font=("Arial", 10, "bold"))
+    lbl.pack(pady=2)
+    entry = tk.Entry(app, font=("Arial", 11), justify="center", bd=2, width=15)
+    entry.pack(pady=2)
+    return entry
 
-tk.Label(app, text="درجة المادة الثالثة:", bg="#f5f5f5", font=("Arial", 10, "bold")).pack(pady=5)
-entry3 = tk.Entry(app, font=("Arial", 10), justify="center")
-entry3.pack()
+# توليد خانات الإدخال للمواد الخمسة
+entry1 = create_input_field("درجة المادة الأولى:")
+entry2 = create_input_field("درجة المادة الثانية:")
+entry3 = create_input_field("درجة المادة الثالثة:")
+entry4 = create_input_field("درجة المادة الرابعة:")
+entry5 = create_input_field("درجة المادة الخامسة:")
 
-# زر حساب النتيجة والتقدير
-tk.Button(app, text="احسب النتيجة والتقدير", command=calculate, bg="#4CAF50", fg="white", font=("Arial", 11, "bold"), cursor="hand2").pack(pady=20)
+# زر الحساب المطور بألوان متناسقة وحجم أوضح
+btn_calc = tk.Button(app, text="⚙️ احسب المعدل والتقرير", command=calculate, bg="#27ae60", fg="white", font=("Arial", 11, "bold"), width=22, cursor="hand2", bd=0)
+btn_calc.pack(pady=20)
 
-# زر الانتقال إلى حساب GitHub الخاص بكِ
-tk.Button(app, text="🌐 عرض المشروع على GitHub", command=open_github, bg="#24292e", fg="white", font=("Arial", 10, "bold"), cursor="hand2").pack(pady=10)
+# زر الجيت هاب في الأسفل بشكل أنيق
+btn_git = tk.Button(app, text="🌐 تابع المشروع على GitHub", command=open_github, bg="#34495e", fg="#ecf0f1", font=("Arial", 9, "bold"), width=25, cursor="hand2", bd=0)
+btn_git.pack(pady=5)
 
-# تشغيل نافذة البرنامج واستمرارها في استقبال الأوامر
 app.mainloop()
+
